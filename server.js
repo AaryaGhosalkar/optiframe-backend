@@ -28,6 +28,7 @@ app.use(
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
+app.use("/frames", express.static("frames"));
 
 const paymentRoutes = require("./routes/paymentRoutes");
 app.use("/api/payment", paymentRoutes);
