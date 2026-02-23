@@ -1,0 +1,25 @@
+{
+  "name": "optiframe-backend",
+  "version": "1.0.0",
+  "description": "Backend API for OptiFrame AR eyewear ecommerce platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "kill-ports": "node -e \"const { exec } = require('child_process'); [5000, 5001, 3001, 8000].forEach(p => { exec(`netstat -ano | findstr :${p}`, (e, o) => { if (o) { const pid = o.split(/\\s+/).pop(); if (pid) exec(`taskkill /PID ${pid} /F`, () => console.log(`Killed process on port ${p}`)); } }); });\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
