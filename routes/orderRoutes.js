@@ -2,89 +2,44 @@ const express = require("express");
 const router = express.Router();
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const { verifyToken, verifyAdmin } = require("../middleware/authMiddleware");
 
-// 🔐 Admin Verification Middleware
-const verifyAdmin = (req, res, next) => {
-  const secret = req.headers["admin-secret"];
+// CREATE ORDER (logged in user)
+router.post("/", verifyToken, async (req, res) => {
+  const { customerEmail, items, totalAmount } = req.body;
 
-  if (secret !== process.env.ADMIN_SECRET) {
-    return res.status(403).json({ message: "Access denied" });
+  for (const item of items) {
+    const product = await Product.findById(item._id);
+    if (!product || product.stock < item.quantity) {
+      return res.status(400).json({ message: "Stock issue" });
+    }
+    product.stock -= item.quantity;
+    await product.save();
   }
 
-  next();
-};
+  const newOrder = new Order({
+    customerEmail,
+    items,
+    totalAmount,
+    status: "Pending"
+  });
 
-// ================= CREATE ORDER (PUBLIC) =================
-router.post("/", async (req, res) => {
-  try {
-    const { customerEmail, items, totalAmount } = req.body;
-
-    if (!customerEmail || !items || items.length === 0) {
-      return res.status(400).json({ message: "Invalid order data" });
-    }
-
-    // Check and reduce stock
-    for (const item of items) {
-      const product = await Product.findById(item._id);
-
-      if (!product) {
-        return res.status(404).json({
-          message: `Product not found: ${item.name}`,
-        });
-      }
-
-      if (product.stock < item.quantity) {
-        return res.status(400).json({
-          message: `${product.name} is out of stock`,
-        });
-      }
-
-      product.stock -= item.quantity;
-      await product.save();
-    }
-
-    const newOrder = new Order({
-      customerEmail,
-      items,
-      totalAmount,
-      status: "Pending",
-    });
-
-    await newOrder.save();
-
-    res.status(201).json(newOrder);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Order creation failed" });
-  }
+  await newOrder.save();
+  res.json(newOrder);
 });
 
-// ================= GET ALL ORDERS (PUBLIC FOR NOW) =================
-router.get("/", async (req, res) => {
-  try {
-    const orders = await Order.find().sort({ createdAt: -1 });
-    res.json(orders);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching orders" });
-  }
+// ADMIN ONLY - get all orders
+router.get("/", verifyToken, verifyAdmin, async (req, res) => {
+  const orders = await Order.find().sort({ createdAt: -1 });
+  res.json(orders);
 });
 
-// ================= UPDATE ORDER STATUS (ADMIN ONLY) =================
-router.put("/:id", verifyAdmin, async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
-
-    order.status = req.body.status;
-    await order.save();
-
-    res.json(order);
-  } catch (err) {
-    res.status(500).json({ message: "Error updating order" });
-  }
+// ADMIN ONLY - update status
+router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  order.status = req.body.status;
+  await order.save();
+  res.json(order);
 });
 
 module.exports = router;
