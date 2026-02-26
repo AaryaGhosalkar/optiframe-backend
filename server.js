@@ -21,7 +21,34 @@ mongoose
 // ================= API ROUTES =================
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
-app.use("/api/users", userRoutes);
+
+// ================= USER LOGIN & REGISTER =================
+
+app.post("/api/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: { name, email },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    res.status(200).json({
+      message: "Login successful",
+      user: { email },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
 
 // ================= SERVE FRONTEND =================
 
