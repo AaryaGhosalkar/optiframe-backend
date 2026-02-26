@@ -6,6 +6,9 @@ import { fileURLToPath } from "url";
 
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+
+app.use("/api/payment", paymentRoutes);
 
 dotenv.config();
 
