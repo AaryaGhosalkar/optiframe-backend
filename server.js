@@ -1,37 +1,41 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const path = require("path");
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const productRoutes = require("./routes/productRoutes");
-const orderRoutes = require("./routes/orderRoutes");
-const paymentRoutes = require("./routes/paymentRoutes");
+import productRoutes from "./routes/productRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+
+dotenv.config();
 
 const app = express();
-
-app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI)
+// ================= DB =================
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
 
-/* ================= API ROUTES ================= */
-
+// ================= API ROUTES =================
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
-app.use("/api/payment", paymentRoutes);
 
-/* ================= SERVE FRONTEND ================= */
+// ================= SERVE FRONTEND =================
 
-app.use(express.static(path.join(__dirname, "../dist")));
+// IMPORTANT PART
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+// Serve static files from dist
+app.use(express.static(path.join(__dirname, "dist")));
+
+// Catch-all (VERY IMPORTANT)
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
-/* ================= START SERVER ================= */
-
+// ================= START =================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
