@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -84,8 +85,6 @@ process.on('SIGTERM', () => {
   console.log('Server terminated');
   process.exit(0);
 });
-
-const path = require("path");
 
 // Serve frontend build
 app.use(express.static(path.join(__dirname, "dist")));
