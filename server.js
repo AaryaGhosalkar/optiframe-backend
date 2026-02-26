@@ -22,9 +22,9 @@ mongoose
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 
-// ================= USER LOGIN & REGISTER =================
+// ================= AUTH ROUTES =================
 
-app.post("/api/register", async (req, res) => {
+app.post("/api/auth/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -37,7 +37,7 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-app.post("/api/login", async (req, res) => {
+app.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
