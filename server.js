@@ -8,8 +8,6 @@ import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 
-app.use("/api/payment", paymentRoutes);
-
 dotenv.config();
 
 const app = express();
@@ -24,6 +22,7 @@ mongoose
 // ================= API ROUTES =================
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // ================= AUTH ROUTES =================
 
