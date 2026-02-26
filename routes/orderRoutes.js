@@ -3,7 +3,18 @@ const router = express.Router();
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 
-// CREATE ORDER + REDUCE STOCK
+// 🔐 Admin Verification Middleware
+const verifyAdmin = (req, res, next) => {
+  const secret = req.headers["admin-secret"];
+
+  if (secret !== process.env.ADMIN_SECRET) {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
+  next();
+};
+
+// ================= CREATE ORDER (PUBLIC) =================
 router.post("/", async (req, res) => {
   try {
     const { customerEmail, items, totalAmount } = req.body;
@@ -12,7 +23,7 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Invalid order data" });
     }
 
-    // Check and update stock
+    // Check and reduce stock
     for (const item of items) {
       const product = await Product.findById(item._id);
 
@@ -28,12 +39,10 @@ router.post("/", async (req, res) => {
         });
       }
 
-      // reduce stock
       product.stock -= item.quantity;
       await product.save();
     }
 
-    // create order
     const newOrder = new Order({
       customerEmail,
       items,
@@ -50,21 +59,18 @@ router.post("/", async (req, res) => {
   }
 });
 
-module.exports = router;
-
-// Get all orders
+// ================= GET ALL ORDERS (PUBLIC FOR NOW) =================
 router.get("/", async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Error fetching orders" });
   }
 });
 
-// Update order status
-router.put("/:id", async (req, res) => {
+// ================= UPDATE ORDER STATUS (ADMIN ONLY) =================
+router.put("/:id", verifyAdmin, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
 
@@ -77,7 +83,6 @@ router.put("/:id", async (req, res) => {
 
     res.json(order);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Error updating order" });
   }
 });
