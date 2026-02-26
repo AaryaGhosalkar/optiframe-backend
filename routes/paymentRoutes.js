@@ -1,5 +1,6 @@
 const express = require("express");
 const Razorpay = require("razorpay");
+const crypto = require("crypto");
 
 const router = express.Router();
 
@@ -8,22 +9,20 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
+// Create Razorpay order
 router.post("/create-order", async (req, res) => {
-  console.log("CREATE ORDER HIT");
-  console.log("Body:", req.body);
   try {
     const { amount } = req.body;
 
     const options = {
-      amount: amount * 100,
+      amount: amount * 100, // paise
       currency: "INR",
-      receipt: "receipt_order_" + Date.now(),
+      receipt: "receipt_" + Date.now(),
     };
 
     const order = await razorpay.orders.create(options);
 
     res.json(order);
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Payment order creation failed" });

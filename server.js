@@ -28,9 +28,7 @@ app.use(
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
-
-const paymentRoutes = require("./routes/paymentRoutes");
-app.use("/api/payment", paymentRoutes);
+app.use("/api/payment", require("./routes/paymentRoutes"));
 
 // Health check
 app.get('/api/health', (req, res) => {
