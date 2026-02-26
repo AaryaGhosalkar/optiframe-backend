@@ -21,6 +21,7 @@ mongoose
 // ================= API ROUTES =================
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/users", userRoutes);
 
 // ================= SERVE FRONTEND =================
 
