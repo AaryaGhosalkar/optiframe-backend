@@ -55,7 +55,7 @@ app.post("/api/auth/login", async (req, res) => {
 // ================= SERVE FRONTEND =================
 
 const __filename = fileURLToPath(import.meta.url);
-const _dirname = path.dirname(_filename);
+const __dirname = path.dirname(_filename);
 
 /* SERVE FRONTEND */
 app.use(express.static(path.join(__dirname, "../dist")));
