@@ -54,16 +54,14 @@ app.post("/api/auth/login", async (req, res) => {
 
 // ================= SERVE FRONTEND =================
 
-// IMPORTANT PART
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const _dirname = path.dirname(_filename);
 
-// Serve static files from dist
-app.use(express.static(path.join(__dirname, "dist")));
+/* SERVE FRONTEND */
+app.use(express.static(path.join(__dirname, "../dist")));
 
-// Catch-all (VERY IMPORTANT)
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "../dist/index.html"));
 });
 
 // ================= START =================
