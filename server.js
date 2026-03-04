@@ -30,27 +30,57 @@ app.use("/api/payment", paymentRoutes);
 
 // Auth (simple for now)
 app.post("/api/auth/register", async (req, res) => {
+
   try {
+
     const { name, email, password } = req.body;
 
-    res.status(201).json({
-      message: "User registered successfully",
-      user: { name, email },
+    const existingUser = await mongoose.connection.collection("users").findOne({ email });
+
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    await mongoose.connection.collection("users").insertOne({
+      name,
+      email,
+      password
     });
-  } catch (err) {
+
+    res.status(201).json({
+      message: "User registered successfully"
+    });
+
+  } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
+
 });
 
 app.post("/api/auth/login", async (req, res) => {
   try {
+
     const { email, password } = req.body;
 
-    res.json({
+    const user = await mongoose.connection.collection("users").findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ message: "User not registered" });
+    }
+
+    if (user.password !== password) {
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+
+    res.status(200).json({
       message: "Login successful",
-      user: { email },
+      user: {
+        name: user.name,
+        email: user.email
+      }
     });
-  } catch (err) {
+
+  } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
