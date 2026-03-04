@@ -63,7 +63,7 @@ app.post("/api/auth/login", async (req, res) => {
 });
 
 // ================= SERVE FRONTEND =================
-const distPath = path.resolve(__dirname, "../dist");
+const distPath = path.resolve(__dirname, "dist");
 
 app.use(express.static(distPath));
 
