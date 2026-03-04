@@ -13,65 +13,57 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// ================= PATH SETUP =================
+// Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ================= DATABASE =================
+// MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
-// ================= STATIC FILES =================
-
-// serve frames/images
-app.use("/frames", express.static(path.join(__dirname, "public/frames")));
-
-// ================= API ROUTES =================
-
+// API routes
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 
-// ================= AUTH ROUTES =================
-
+// Auth (simple for now)
 app.post("/api/auth/register", async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, password } = req.body;
 
     res.status(201).json({
       message: "User registered successfully",
       user: { name, email },
     });
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
 
 app.post("/api/auth/login", async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, password } = req.body;
 
-    res.status(200).json({
+    res.json({
       message: "Login successful",
       user: { email },
     });
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
 
-// ================= SERVE FRONTEND =================
-const distPath = path.resolve(__dirname, "dist");
+// Serve frontend
+const distPath = path.join(__dirname, "dist");
 
 app.use(express.static(distPath));
 
+// IMPORTANT: this fixes React routes like /admin /products /tryon
 app.get("*", (req, res) => {
   res.sendFile(path.join(distPath, "index.html"));
 });
-
-// ================= SERVER =================
 
 const PORT = process.env.PORT || 5000;
 
