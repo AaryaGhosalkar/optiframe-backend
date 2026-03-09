@@ -2,11 +2,28 @@ const express = require("express");
 const router = express.Router();
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+const uploadDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
+});
+const upload = multer({ storage });
 
 // ================= CREATE ORDER =================
-router.post("/", async (req, res) => {
+router.post("/", upload.single("prescriptionFile"), async (req, res) => {
   try {
-    const { customerEmail, items, totalAmount } = req.body;
+    let { customerEmail, items, totalAmount, shippingAddress, paymentId } = req.body;
+
+    if (typeof items === "string") items = JSON.parse(items);
+    if (typeof shippingAddress === "string") shippingAddress = JSON.parse(shippingAddress);
 
     if (!customerEmail || !items || items.length === 0) {
       return res.status(400).json({ message: "Invalid order data" });
@@ -36,7 +53,10 @@ router.post("/", async (req, res) => {
       customerEmail,
       items,
       totalAmount,
+      shippingAddress,
+      paymentId,
       status: "Pending",
+      prescriptionFile: req.file ? `uploads/${req.file.filename}` : undefined
     });
 
     await newOrder.save();

@@ -36,6 +36,7 @@ const orderSchema = new mongoose.Schema({
   landmark: String,
 },
 paymentId: String,
+prescriptionFile: String,
 });
 
 module.exports = mongoose.model("Order", orderSchema);
