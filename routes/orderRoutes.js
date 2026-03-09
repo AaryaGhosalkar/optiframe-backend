@@ -20,7 +20,7 @@ const upload = multer({ storage });
 // ================= CREATE ORDER =================
 router.post("/", upload.single("prescriptionFile"), async (req, res) => {
   try {
-    let { customerEmail, items, totalAmount, shippingAddress, paymentId } = req.body;
+    let { customerEmail, items, totalAmount, shippingAddress, paymentId, lensType } = req.body;
 
     if (typeof items === "string") items = JSON.parse(items);
     if (typeof shippingAddress === "string") shippingAddress = JSON.parse(shippingAddress);
@@ -55,6 +55,7 @@ router.post("/", upload.single("prescriptionFile"), async (req, res) => {
       totalAmount,
       shippingAddress,
       paymentId,
+      lensType,
       status: "Pending",
       prescriptionFile: req.file ? `uploads/${req.file.filename}` : undefined
     });
