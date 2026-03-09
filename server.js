@@ -88,6 +88,7 @@ app.post("/api/auth/login", async (req, res) => {
 // Serve frontend
 const distPath = path.join(__dirname, "dist");
 
+app.use("/uploads", express.static("uploads"));
 app.use(express.static(distPath));
 
 // IMPORTANT: this fixes React routes like /admin /products /tryon

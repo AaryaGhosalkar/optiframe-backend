@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // ================= CREATE ORDER =================
-router.post("/", upload.single("prescriptionFile"), async (req, res) => {
+router.post("/", upload.single("prescription"), async (req, res) => {
   try {
     let { customerEmail, items, totalAmount, shippingAddress, paymentId, lensType } = req.body;
 
@@ -57,7 +57,7 @@ router.post("/", upload.single("prescriptionFile"), async (req, res) => {
       paymentId,
       lensType,
       status: "Pending",
-      prescriptionFile: req.file ? `uploads/${req.file.filename}` : undefined
+      prescriptionFile: req.file ? `/uploads/${req.file.filename}` : null
     });
 
     await newOrder.save();
